@@ -10,29 +10,29 @@ support_callback = CallbackData('contact_support', 'messages', 'user_id', 'who_w
 cancel_support_callback = CallbackData('cancel_support', 'user_id')
 
 
-async def check_support_available(support_id: int) -> int | None:
+async def free_operator_check(support_id: int | str) -> int | str | None:
     state = dp.current_state(chat=support_id, user=support_id)
     state_now: str = await state.get_state()
     if state_now != "in_support":
         return support_id
 
 
-async def get_support_manager() -> int | None:
+async def get_operator_id() -> int | None:
     for support_id in id_operators:
-        support_id: int = await check_support_available(support_id)
+        support_id: int = await free_operator_check(support_id)
         return support_id if support_id else None
 
 
-async def support_keyboard(messages: str, user_id=None):
+async def support_kb(messages: str, user_id: int | str = None):
     if user_id:
-        contact_id, who_will_press_button, text = user_id, 'operator', 'Ответить пользователю'
+        contact_id, who_will_press_button, text = user_id, 'operator', 'Ответить'
     else:
-        contact_id, who_will_press_button = await get_support_manager(), 'user'
+        contact_id, who_will_press_button = await get_operator_id(), 'user'
         if messages == 'correspondence_with_operator' and contact_id is None:
             return False
-        elif messages == 'contacting support' and contact_id is None:
+        elif messages == 'contacting_support' and contact_id is None:
             contact_id: int = random_choice(id_operators)
-        text: str = 'Написать обращение' if messages == 'contacting support' else 'Написать оператору'
+        text: str = 'Написать обращение' if messages == 'contacting_support' else 'Написать оператору'
 
     keyboard = InlineKeyboardMarkup()
     keyboard.add(
