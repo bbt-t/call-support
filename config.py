@@ -1,11 +1,9 @@
 from datetime import datetime
 from os import getenv
-import pytz
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 load_dotenv()
-
-
 
 
 adminsbot: dict = {
@@ -16,19 +14,8 @@ adminsbot: dict = {
 
 BOT_TOKEN = getenv('BOT_TOKEN')
 
-API_WEATHER = getenv('API_WEATHER')
-API_WEATHER2 = getenv('API_WEATHER2')
-CITY_WEATHER = getenv('CITY_WEATHER')
-
-pkl_key = getenv('PKL_KEY')
-
-FOLDER_ID = getenv('FOLDER_ID')
-API_YA_STT = getenv('API_YA_STT')
-API_YA_TTS = getenv('API_YA_TTS')
-
 timezone = getenv('TIMEZONE')
-time_zone = pytz.timezone(timezone)
-time_now = time_zone.localize(datetime.now())
+time_now = datetime.now(ZoneInfo(timezone))
 
 HOST = getenv('HOST')
 
