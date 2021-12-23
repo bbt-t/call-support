@@ -1,9 +1,7 @@
 from aiogram.utils import executor
 
 from loader import dp, scheduler, logger_guru
-
-
-
+import utils.db.gino_shell_for_ORM_sqlalchemy as GINO
 
 
 async def on_startup(dp):
@@ -20,19 +18,24 @@ async def on_startup(dp):
     from utils.notify_admins import on_startup_notify
     await on_startup_notify(dp)
 
-    #logger_guru.info('DB error on start bot')
+    await GINO.db_startup()
+    #await GINO.db_shell.gino.drop_all()
+    await GINO.db_shell.gino.create_all()
 
 
 @logger_guru.catch()
 async def on_shutdown(dp):
     """
-    Notifying admins about the stop of the bot, save Todo objects.
+    Notifying admins about the stop of the bot
     :param dp: Dispatcher
     """
     from utils.notify_admins import on_shutdown_notify
     await on_shutdown_notify(dp)
+
     await dp.storage.close()
     await dp.storage.wait_closed()
+
+    await GINO.db_shutdown()
     raise SystemExit
 
 

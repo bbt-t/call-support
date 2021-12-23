@@ -17,13 +17,13 @@ from utils.keyboards.inline.kb_for_communication_with_support_inl import support
 @dp.message_handler(Command('support'))
 async def contact_support(message: Message):
     if message.from_user.id in id_operators:
-        await message.answer('Привет! Готов поработать?)', reply_markup=operator_kb)
+        await message.answer('Привет! Готов поработать?', reply_markup=operator_kb)
     else:
         keyboard_for_msg = await support_kb(messages='contacting_support')
         await message.answer('Привет! Выбери способ связи, письменное обращение?',
                              reply_markup=keyboard_for_msg)
-        keyboard_for_call = await support_kb(messages='correspondence_with_operator')
-        await message.answer('или будем звонить...', reply_markup=keyboard_for_call)
+        keyboard_for_chat = await support_kb(messages='correspondence_with_operator')
+        await message.answer('или будем чатиться?)', reply_markup=keyboard_for_chat)
 
 
 @dp.callback_query_handler(support_callback.filter(messages='contacting_support'))
@@ -49,11 +49,10 @@ async def get_support_message(message: Message, state: FSMContext):
 
 @dp.callback_query_handler(support_callback.filter(messages='correspondence_with_operator',
                                                    who_will_press_button='user'))
-async def call_to_support(call: CallbackQuery, state: FSMContext, callback_data: dict):
+async def chat_with_support(call: CallbackQuery, state: FSMContext, callback_data: dict):
     await call.message.edit_text('OK! теперь ждём ответа от оператора...')
 
     user_id: str = callback_data.get('user_id')
-
     support_id = await get_operator_id() if not await free_operator_check(user_id) else user_id
 
     if not support_id:
@@ -71,7 +70,7 @@ async def call_to_support(call: CallbackQuery, state: FSMContext, callback_data:
 
 @dp.callback_query_handler(support_callback.filter(messages='correspondence_with_operator',
                                                    who_will_press_button='operator'))
-async def accept_call_to_support(call: CallbackQuery, state: FSMContext, callback_data: dict):
+async def accept_chat_with_support(call: CallbackQuery, state: FSMContext, callback_data: dict):
     second_id: str = callback_data.get('user_id')
     user_state = dp.current_state(user=second_id, chat=second_id)
 
@@ -82,8 +81,7 @@ async def accept_call_to_support(call: CallbackQuery, state: FSMContext, callbac
         await state.set_state('in_support')
         await state.update_data(second_id=second_id)
 
-        kb = cancel_support(second_id)
-        kb_for_user = cancel_support(call.from_user.id)
+        kb, kb_for_user = cancel_support(second_id), cancel_support(call.from_user.id)
 
         await call.message.edit_text('ЕСТЬ КОНТАКТ!\nчтобы завершить ваше общение можно нажать кнопку ниже...',
                                      reply_markup=kb)
