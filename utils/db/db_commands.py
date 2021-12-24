@@ -25,12 +25,3 @@ async def select_all_users():
 async def update_email(telegram_id, email):
     user_obj = await Users.get(telegram_id)
     await user_obj.update(email=email).apply()
-
-
-
-
-
-
-
-
-
