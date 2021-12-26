@@ -28,3 +28,4 @@ logger_guru.add(
     rotation='00:00',
     compression='gz',
     )
+

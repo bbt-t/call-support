@@ -1,7 +1,12 @@
+from asyncio import set_event_loop_policy
+
+from uvloop import EventLoopPolicy
 from aiogram.utils import executor
 
 from loader import dp, scheduler, logger_guru
 import utils.db.gino_shell_for_ORM_sqlalchemy as GINO
+
+
 
 
 async def on_startup(dp):
@@ -19,7 +24,7 @@ async def on_startup(dp):
     await on_startup_notify(dp)
 
     await GINO.db_startup()
-    #await GINO.db_shell.gino.drop_all()
+    await GINO.db_shell.gino.drop_all()
     await GINO.db_shell.gino.create_all()
 
 
@@ -40,6 +45,7 @@ async def on_shutdown(dp):
 
 
 if __name__ == '__main__':
+    set_event_loop_policy(EventLoopPolicy())
     scheduler.start()
     try:
         executor.start_polling(dp, on_startup=on_startup, on_shutdown=on_shutdown, skip_updates=True)
